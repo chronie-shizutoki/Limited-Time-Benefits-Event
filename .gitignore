@@ -1,0 +1,6 @@
+node_modules
+*.apk
+server/data/outdate-test-markdown
+android/MIUIX helper
+activities.json
+gradle-*.zip

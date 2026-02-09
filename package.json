@@ -1,0 +1,21 @@
+{
+  "name": "gift-activity-center",
+  "version": "1.0.0",
+  "description": "限时福利活动",
+  "main": "server/main.js",
+  "scripts": {
+    "start": "node server/main.js",
+    "dev": "nodemon server/main.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "author": "",
+  "license": "MIT"
+}
