@@ -6,7 +6,12 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Use a more compatible date format
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+}
+
 fun getBuildDate(): String {
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -37,6 +42,15 @@ android {
         version = release(36)
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = keystoreProperties["STORE_FILE"]?.let { file(it as String) }
+            storePassword = keystoreProperties["STORE_PASSWORD"] as? String
+            keyAlias = keystoreProperties["KEY_ALIAS"] as? String
+            keyPassword = keystoreProperties["KEY_PASSWORD"] as? String
+        }
+    }
+
     defaultConfig {
         applicationId = "com.chronie.gift"
         minSdk = 24
@@ -51,11 +65,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
