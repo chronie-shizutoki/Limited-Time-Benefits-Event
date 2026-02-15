@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Load saved language setting
+        // Load saved language setting (null means follow system language)
         val languageManager = LanguageManager(this)
         val savedLanguage = languageManager.getSavedLanguage()
         languageManager.applyLanguage(savedLanguage)

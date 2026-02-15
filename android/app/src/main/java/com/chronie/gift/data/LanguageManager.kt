@@ -11,7 +11,6 @@ import java.util.Locale
 class LanguageManager(private val context: Context) {
     companion object {
         private const val LANGUAGE_KEY = "preferred_language"
-        private const val DEFAULT_LANGUAGE = "en"
         private const val PREF_NAME = "app_preferences"
     }
 
@@ -26,20 +25,37 @@ class LanguageManager(private val context: Context) {
         preferences.edit().putString(LANGUAGE_KEY, languageCode).apply()
     }
 
-    // Get saved language setting
-    fun getSavedLanguage(): String {
+    // Clear language setting to follow system language
+    fun clearLanguage() {
         val preferences = getPreferences()
-        return preferences.getString(LANGUAGE_KEY, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
+        preferences.edit().remove(LANGUAGE_KEY).apply()
+    }
+
+    // Get saved language setting, returns null if not set (follow system language)
+    fun getSavedLanguage(): String? {
+        val preferences = getPreferences()
+        return preferences.getString(LANGUAGE_KEY, null)
     }
 
     // Apply language setting
-    fun applyLanguage(languageCode: String) {
-        val locale = when (languageCode) {
-            "zh-CN" -> Locale.SIMPLIFIED_CHINESE
-            "zh-TW" -> Locale.TRADITIONAL_CHINESE
-            "en" -> Locale.ENGLISH
-            "ja" -> Locale.JAPANESE
-            else -> Locale.SIMPLIFIED_CHINESE
+    fun applyLanguage(languageCode: String?) {
+        val locale = if (languageCode == null) {
+            // Use system default language from system resources
+            val systemConfig = Resources.getSystem().configuration
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                systemConfig.locales[0]
+            } else {
+                @Suppress("DEPRECATION")
+                systemConfig.locale
+            }
+        } else {
+            when (languageCode) {
+                "zh-CN" -> Locale.SIMPLIFIED_CHINESE
+                "zh-TW" -> Locale.TRADITIONAL_CHINESE
+                "en" -> Locale.ENGLISH
+                "ja" -> Locale.JAPANESE
+                else -> Locale.SIMPLIFIED_CHINESE
+            }
         }
 
         Locale.setDefault(locale)
@@ -96,25 +112,13 @@ class LanguageManager(private val context: Context) {
     }
 
     // Get current resources language setting
-    fun getCurrentLanguage(): String {
-        val resources = context.resources
-        val configuration = resources.configuration
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            configuration.locale
+    fun getCurrentLanguage(): String? {
+        val savedLanguage = getSavedLanguage()
+        if (savedLanguage != null) {
+            return savedLanguage
         }
 
-        return when (locale.language) {
-            "zh" -> if (locale.country == "TW" || locale.country == "HK" || locale.country == "MO") {
-                "zh-TW"
-            } else {
-                "zh-CN"
-            }
-            "en" -> "en"
-            "ja" -> "ja"
-            else -> DEFAULT_LANGUAGE
-        }
+        // If no saved language, return null to indicate following system language
+        return null
     }
 }

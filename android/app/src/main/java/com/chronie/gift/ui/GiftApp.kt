@@ -89,9 +89,13 @@ fun GiftApp() {
     }
     
     // Update language callback
-    val updateLanguageCode = { newLanguageCode: String ->
+    val updateLanguageCode = { newLanguageCode: String? ->
         languageController.languageCode = newLanguageCode
-        languageManager.saveLanguage(newLanguageCode)
+        if (newLanguageCode == null) {
+            languageManager.clearLanguage()
+        } else {
+            languageManager.saveLanguage(newLanguageCode)
+        }
         languageManager.applyLanguage(newLanguageCode)
     }
     

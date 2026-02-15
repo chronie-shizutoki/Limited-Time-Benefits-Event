@@ -39,10 +39,10 @@ import top.yukonga.miuix.kmp.extra.SuperDropdown
 @Composable
 fun SettingsScreen(
     onThemeUpdated: (String) -> Unit = {},
-    onLanguageUpdated: (String) -> Unit = {},
+    onLanguageUpdated: (String?) -> Unit = {},
     onCheckUpdate: () -> Unit = {},
     isCheckingUpdate: Boolean = false,
-    currentLanguageCode: String = "en"
+    currentLanguageCode: String? = null
 ) {
     val context = LocalContext.current
     
@@ -53,15 +53,20 @@ fun SettingsScreen(
     val scrollBehavior = MiuixScrollBehavior()
     
     val languageOptions = listOf(
+        stringResource(id = R.string.language_follow_system),
         stringResource(id = R.string.language_en),
         stringResource(id = R.string.language_ja),
         stringResource(id = R.string.language_zh_cn),
         stringResource(id = R.string.language_zh_tw),
     )
     
-    val languageCodes = listOf("en", "ja", "zh-CN", "zh-TW")
+    val languageCodes = listOf(null, "en", "ja", "zh-CN", "zh-TW")
     
-    val initialLanguageIndex = languageCodes.indexOf(currentLanguageCode).takeIf { it >= 0 } ?: 0
+    val initialLanguageIndex = if (currentLanguageCode == null) {
+        0
+    } else {
+        languageCodes.indexOf(currentLanguageCode).takeIf { it >= 0 } ?: 0
+    }
     
     var selectedLanguageIndex by remember {
         mutableStateOf(initialLanguageIndex)
